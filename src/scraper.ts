@@ -32,6 +32,7 @@ import {
   fetchListTweets,
 } from './tweets';
 import fetch from 'cross-fetch';
+import { getDialogs, InboxInitialState, sendMessage, SendMessageParams } from './dialogs';
 
 const twUrl = 'https://twitter.com';
 
@@ -466,5 +467,23 @@ export class Scraper {
     }
 
     return res.value;
+  }
+
+  /**
+   * Fetches user dialogs.
+   * @returns The {@link InboxInitialState} object.
+   */
+  public getDialogs(): Promise<InboxInitialState> {
+    return getDialogs(this.auth);
+  }
+
+
+  /**
+   * Sends message in a conversation.
+   * @param id The ID of the tweet to fetch.
+   * @returns The {@link Tweet} object, or `null` if it couldn't be fetched.
+   */
+  public sendMessage(body: SendMessageParams): Promise<any> {
+    return sendMessage(body, this.auth);
   }
 }

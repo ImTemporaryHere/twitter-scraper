@@ -1,5 +1,7 @@
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { Scraper } from './scraper';
+import fs from 'fs/promises';
+import * as tough from 'tough-cookie';
 
 export interface ScraperTestOptions {
   /**
@@ -17,7 +19,9 @@ export async function getScraper(
   const password = process.env['TWITTER_PASSWORD'];
   const email = process.env['TWITTER_EMAIL'];
   const twoFactorSecret = process.env['TWITTER_2FA_SECRET'];
-  const cookies = process.env['TWITTER_COOKIES'];
+  const cookies = JSON.parse(
+    await fs.readFile('cookies.json', { encoding: 'utf8' }),
+  ).map((i: any) => new tough.Cookie(i));
   const proxyUrl = process.env['PROXY_URL'];
   let agent: any;
 
@@ -54,7 +58,7 @@ export async function getScraper(
   if (options.authMethod === 'password') {
     await scraper.login(username!, password!, email, twoFactorSecret);
   } else if (options.authMethod === 'cookies') {
-    await scraper.setCookies(JSON.parse(cookies!));
+    await scraper.setCookies(cookies!);
   }
 
   return scraper;

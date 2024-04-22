@@ -2,6 +2,7 @@ import { getScraper } from './test-utils';
 import { Mention, Tweet } from './tweets';
 import { QueryTweetsResponse } from './timeline-v1';
 import { SearchMode } from './search';
+import 'dotenv/config';
 
 test('scraper can get tweet', async () => {
   const expected: Tweet = {

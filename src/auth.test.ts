@@ -1,4 +1,5 @@
 import { getScraper } from './test-utils';
+import 'dotenv/config';
 
 const testLogin = process.env['TWITTER_PASSWORD'] ? test : test.skip;
 

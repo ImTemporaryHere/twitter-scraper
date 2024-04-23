@@ -2,7 +2,6 @@ import { TwitterAuth } from './auth';
 import { ApiError } from './errors';
 import { updateCookieJar } from './requests';
 import { Headers } from 'headers-polyfill';
-import FormData from 'form-data';
 
 // For some reason using Parameters<typeof fetch> reduces the request transform function to
 // `(url: string) => string` in tests.
@@ -104,18 +103,15 @@ export async function requestApi<T>(
     };
   }
 
-
   if (res.headers.get('x-rate-limit-incoming') == '0') {
     auth.deleteToken();
   }
 
   let value;
   try {
-   value = await res.json();
-  }
-  catch (e) {
-  }
-  return  { success: true, value};
+    value = await res.json();
+  } catch (e) {}
+  return { success: true, value };
 }
 
 /** @internal */

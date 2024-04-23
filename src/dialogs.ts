@@ -1,8 +1,6 @@
 import { TwitterAuth } from './auth';
-import { requestApi, RequestApiResult } from './api';
-import stringify from 'json-stable-stringify';
-import { parseProfile, Profile, UserRaw } from './profile';
-import {v1} from 'uuid';
+import { requestApi } from './api';
+import { v1 } from 'uuid';
 import { uploadMedia } from './uploads';
 
 interface MessageData {
@@ -67,7 +65,7 @@ interface MessageData {
           url: string;
         }[];
       };
-      features: {};
+      features: Record<any, any>;
       ext_alt_text: string;
       ext_media_color: {
         palette: {
@@ -203,49 +201,45 @@ export interface InboxInitialState {
     key_registry_state: {
       status: string;
     };
-  }
+  };
 }
-
 
 export async function getDialogs(
   auth: TwitterAuth,
 ): Promise<InboxInitialState> {
-  const params = new URLSearchParams();
-  const queryParams = {
-    nsfw_filtering_enabled: false,
-    include_profile_interstitial_type: 1,
-    include_blocking: 1,
-    include_blocked_by: 1,
-    include_followed_by: 1,
-    include_want_retweets: 1,
-    include_mute_edge: 1,
-    include_can_dm: 1,
-    include_can_media_tag: 1,
-    include_ext_is_blue_verified: 1,
-    include_ext_verified_type: 1,
-    include_ext_profile_image_shape: 1,
-    skip_status: 1,
-    dm_secret_conversations_enabled: false,
-    krs_registration_enabled: true,
+  const params = new URLSearchParams({
+    nsfw_filtering_enabled: 'false',
+    include_profile_interstitial_type: '1',
+    include_blocking: '1',
+    include_blocked_by: '1',
+    include_followed_by: '1',
+    include_want_retweets: '1',
+    include_mute_edge: '1',
+    include_can_dm: '1',
+    include_can_media_tag: '1',
+    include_ext_is_blue_verified: '1',
+    include_ext_verified_type: '1',
+    include_ext_profile_image_shape: '1',
+    skip_status: '1',
+    dm_secret_conversations_enabled: 'false',
+    krs_registration_enabled: 'true',
     cards_platform: 'Web-12',
-    include_cards: 1,
-    include_ext_alt_text: true,
-    include_ext_limited_action_results: true,
-    include_quote_count: true,
-    include_reply_count: 1,
+    include_cards: '1',
+    include_ext_alt_text: 'true',
+    include_ext_limited_action_results: 'true',
+    include_quote_count: 'true',
+    include_reply_count: '1',
     tweet_mode: 'extended',
-    include_ext_views: true,
-    dm_users: true,
-    include_groups: true,
-    include_inbox_timelines: true,
-    include_ext_media_color: true,
-    supports_reactions: true,
-    include_ext_edit_control: true,
-    include_ext_business_affiliations_label: true,
-    ext: 'mediaColor,altText,mediaStats,highlightedLabel,voiceInfo,birdwatchPivot,superFollowMetadata,unmentionInfo,editControl,article'
-  }
-  Object.entries(queryParams).forEach(([key,value])=>params.set(key,value.toString()))
-
+    include_ext_views: 'true',
+    dm_users: 'true',
+    include_groups: 'true',
+    include_inbox_timelines: 'true',
+    include_ext_media_color: 'true',
+    supports_reactions: 'true',
+    include_ext_edit_control: 'true',
+    include_ext_business_affiliations_label: 'true',
+    ext: 'mediaColor,altText,mediaStats,highlightedLabel,voiceInfo,birdwatchPivot,superFollowMetadata,unmentionInfo,editControl,article',
+  });
 
   const res = await requestApi<InboxInitialState>(
     `https://twitter.com/i/api/1.1/dm/inbox_initial_state.json?${params.toString()}`,
@@ -253,32 +247,101 @@ export async function getDialogs(
   );
 
   if (!res.success) {
-    throw res.err
+    throw res.err;
   }
 
-  return res.value
-
-
+  return res.value;
 }
 
 export interface SendMessageParams {
-  conversation_id: string,
-  absolutePathToMedia?: string,
-  text?: string
+  conversation_id: string;
+  absolutePathToMedia?: string;
+  text?: string;
 }
 
+interface UserInResponse {
+  id: string;
+  id_str: string;
+  name: string;
+  screen_name: string;
+  location: string | null;
+  description: string | null;
+  url: string | null;
+  entities: {
+    description: {
+      urls: any[];
+    };
+  };
+  protected: boolean;
+  followers_count: number;
+  friends_count: number;
+  listed_count: number;
+  created_at: string;
+  favourites_count: number;
+  utc_offset: number | null;
+  time_zone: string | null;
+  geo_enabled: boolean;
+  verified: boolean;
+  statuses_count: number;
+  lang: string | null;
+  contributors_enabled: boolean;
+  is_translator: boolean;
+  is_translation_enabled: boolean;
+  profile_background_color: string;
+  profile_background_image_url: string | null;
+  profile_background_image_url_https: string | null;
+  profile_background_tile: boolean;
+  profile_image_url: string;
+  profile_image_url_https: string;
+  profile_link_color: string;
+  profile_sidebar_border_color: string;
+  profile_sidebar_fill_color: string;
+  profile_text_color: string;
+  profile_use_background_image: boolean;
+  default_profile: boolean;
+  default_profile_image: boolean;
+  can_dm: boolean | null;
+  can_secret_dm: boolean | null;
+  can_media_tag: boolean;
+  following: boolean | null;
+  follow_request_sent: boolean | null;
+  notifications: boolean | null;
+  blocking: boolean | null;
+  subscribed_by: boolean | null;
+  blocked_by: boolean | null;
+  want_retweets: boolean | null;
+  business_profile_state: string;
+  translator_type: string;
+  withheld_in_countries: string[];
+  followed_by: boolean | null;
+}
+
+export interface SendMessageResponse {
+  entries: Array<{
+    message: {
+      id: string;
+      time: string;
+      affects_sort: boolean;
+      request_id: string;
+      conversation_id: string;
+      message_data: {
+        id: string;
+        time: string;
+        conversation_id: string;
+        sender_id: string;
+        text: string;
+      };
+    };
+  }>;
+  users: Record<string, UserInResponse>;
+}
 
 export async function sendMessage(
-  {
-    conversation_id,
-   absolutePathToMedia,
-    text
-  }:SendMessageParams,
+  { conversation_id, absolutePathToMedia, text = '' }: SendMessageParams,
   auth: TwitterAuth,
-): Promise<any> {
-
-  if(!text && !absolutePathToMedia) {
-    throw new Error('provide text or media id for the message to be sent')
+) {
+  if (!text && !absolutePathToMedia) {
+    throw new Error('provide text or media id for the message to be sent');
   }
 
   const params = new URLSearchParams();
@@ -293,46 +356,44 @@ export async function sendMessage(
     include_inbox_timelines: true,
     include_ext_media_color: true,
     supports_reactions: true,
-  }
-  Object.entries(queryParams).forEach(([key,value])=>params.set(key,value.toString()))
-
+  };
+  Object.entries(queryParams).forEach(([key, value]) =>
+    params.set(key, value.toString()),
+  );
 
   const body: Record<string, any> = {
     conversation_id,
-    "recipient_ids":false,
-    "request_id": v1(),
+    recipient_ids: false,
+    request_id: v1(),
     text,
-    "cards_platform":"Web-12",
-    "include_cards":1,
-    "include_quote_count":true,
-    "dm_users":false
+    cards_platform: 'Web-12',
+    include_cards: 1,
+    include_quote_count: true,
+    dm_users: false,
+  };
+
+  if (absolutePathToMedia) {
+    const media_id = await uploadMedia(
+      {
+        media_category: 'dm_video',
+        absolutePathToFile: absolutePathToMedia,
+      },
+      auth,
+    );
+
+    body['media_id'] = media_id;
   }
 
-  if(absolutePathToMedia) {
-    const media_id = await uploadMedia({
-      media_category:'dm_video',
-      absolutePathToFile:absolutePathToMedia
-    },
-      auth
-    )
-
-    body['media_id'] = media_id
-  }
-
-
-  const res = await requestApi<any>(
+  const res = await requestApi<SendMessageResponse>(
     `https://twitter.com/i/api/1.1/dm/new2.json?${params.toString()}`,
     auth,
     'POST',
-    JSON.stringify(body)
+    JSON.stringify(body),
   );
 
   if (!res.success) {
-    throw res.err
+    throw res.err;
   }
 
-  return res.value
-
-
+  return res.value;
 }
-

@@ -32,7 +32,13 @@ import {
   fetchListTweets,
 } from './tweets';
 import fetch from 'cross-fetch';
-import { getDialogs, InboxInitialState, sendMessage, SendMessageParams } from './dialogs';
+import {
+  getDialogs,
+  InboxInitialState,
+  sendMessage,
+  SendMessageParams,
+  SendMessageResponse,
+} from './dialogs';
 
 const twUrl = 'https://twitter.com';
 
@@ -470,20 +476,22 @@ export class Scraper {
   }
 
   /**
-   * Fetches user dialogs.
-   * @returns The {@link InboxInitialState} object.
+   * Fetches user dialogs list.
+   * @returns {Promise<InboxInitialState>} object.
    */
   public getDialogs(): Promise<InboxInitialState> {
     return getDialogs(this.auth);
   }
 
-
   /**
-   * Sends message in a conversation.
-   * @param id The ID of the tweet to fetch.
-   * @returns The {@link Tweet} object, or `null` if it couldn't be fetched.
+   * Sends a message in a conversation.
+   * @param {Object} body - The parameters for sending the message.
+   * @param {string} body.conversation_id - The ID of the recipient.
+   * @param {string} [body.text] - The text of the message optional.
+   * @param {string} [body.absolutePathToMedia] - The absolute path to gif/video to be send optional.
+   * @returns {Promise<SendMessageResponse>} A promise that resolves with the result of sending the message.
    */
-  public sendMessage(body: SendMessageParams): Promise<any> {
+  public sendMessage(body: SendMessageParams): Promise<SendMessageResponse> {
     return sendMessage(body, this.auth);
   }
 }

@@ -7,6 +7,8 @@ test('scraper can get dialogs list', async () => {
   const inboxInitialState = await scraper.getDialogs();
 
   expect(inboxInitialState.inbox_initial_state).toBeTruthy();
+
+  console.log(JSON.stringify(inboxInitialState));
 });
 
 test('scraper can send text message', async () => {
@@ -42,3 +44,16 @@ test('scraper can send text message with gif', async () => {
 
   expect(response).toBeTruthy();
 }, 15000);
+
+test('scraper can fetch conversation history', async () => {
+  const scraper = await getScraper();
+
+  const response = await scraper.fetchConversationHistory({
+    max_id: '1782717127763386857',
+    conversationId: '1770958267629605206',
+  });
+
+  expect(response).toBeTruthy();
+
+  console.log(JSON.stringify(response));
+});

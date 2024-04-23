@@ -397,3 +397,141 @@ export async function sendMessage(
 
   return res.value;
 }
+
+export interface FetchConversationHistoryParams {
+  conversationId: string;
+  max_id?: string;
+}
+
+export interface ConversationHistoryResponse {
+  conversation_timeline: {
+    status: string;
+    min_entry_id: string;
+    max_entry_id: string;
+    entries: ConversationEntry[];
+    users: {
+      [userId: string]: UserProfile;
+    };
+  };
+}
+
+interface ConversationEntry {
+  message: {
+    id: string;
+    time: string;
+    request_id?: string;
+    conversation_id: string;
+    message_data: MessageData;
+  };
+}
+
+interface UserProfile {
+  id: string;
+  id_str: string;
+  name: string;
+  screen_name: string;
+  location: string | null;
+  description: string | null;
+  url: string | null;
+  entities: {
+    description: {
+      urls: any[];
+    };
+  };
+  protected: boolean;
+  followers_count: number;
+  friends_count: number;
+  listed_count: number;
+  created_at: string;
+  favourites_count: number;
+  utc_offset: any;
+  time_zone: any;
+  geo_enabled: boolean;
+  verified: boolean;
+  statuses_count: number;
+  lang: any;
+  contributors_enabled: boolean;
+  is_translator: boolean;
+  is_translation_enabled: boolean;
+  profile_background_color: string;
+  profile_background_image_url: string | null;
+  profile_background_image_url_https: string | null;
+  profile_background_tile: boolean;
+  profile_image_url: string;
+  profile_image_url_https: string;
+  profile_link_color: string;
+  profile_sidebar_border_color: string;
+  profile_sidebar_fill_color: string;
+  profile_text_color: string;
+  profile_use_background_image: boolean;
+  default_profile: boolean;
+  default_profile_image: boolean;
+  can_dm: any;
+  can_secret_dm: any;
+  can_media_tag: boolean;
+  following: boolean;
+  follow_request_sent: boolean;
+  notifications: boolean;
+  blocking: boolean;
+  subscribed_by: boolean;
+  blocked_by: boolean;
+  want_retweets: boolean;
+  business_profile_state: string;
+  translator_type: string;
+  withheld_in_countries: any[];
+  followed_by: boolean;
+}
+
+export async function fetchConversationHistory(
+  auth: TwitterAuth,
+  { max_id, conversationId }: FetchConversationHistoryParams,
+): Promise<ConversationHistoryResponse> {
+  const params = new URLSearchParams({
+    // max_id, //id of the last message
+    // context: 'FETCH_DM_CONVERSATION_HISTORY',
+    // include_profile_interstitial_type: '1',
+    // include_blocking: '1',
+    // include_blocked_by: '1',
+    // include_followed_by: '1',
+    // include_want_retweets: '1',
+    // include_mute_edge: '1',
+    // include_can_dm: '1',
+    // include_can_media_tag: '1',
+    // include_ext_is_blue_verified: '1',
+    // include_ext_verified_type: '1',
+    // include_ext_profile_image_shape: '1',
+    // skip_status: '1',
+    // dm_secret_conversations_enabled: 'false',
+    // krs_registration_enabled: 'true',
+    // cards_platform: 'Web-12',
+    // include_cards: '1',
+    // include_ext_alt_text: 'true',
+    // include_ext_limited_action_results: 'true',
+    // include_quote_count: 'true',
+    // include_reply_count: '1',
+    // tweet_mode: 'extended',
+    // include_ext_views: 'true',
+    // dm_users: 'false',
+    // include_groups: 'true',
+    // include_inbox_timelines: 'true',
+    // include_ext_media_color: 'true',
+    // supports_reactions: 'true',
+    // include_conversation_info: 'true',
+    // ext: 'mediaColor,altText,mediaStats,highlightedLabel,voiceInfo,birdwatchPivot,superFollowMetadata,unmentionInfo,editControl,article'
+  });
+
+  if (max_id) {
+    params.set('max_id', max_id);
+  }
+
+  const res = await requestApi<ConversationHistoryResponse>(
+    `https://twitter.com/i/api/1.1/dm/conversation/${conversationId}.json?${params.toString()}`,
+    auth,
+  );
+
+  if (!res.success) {
+    throw res.err;
+  }
+
+  return res.value;
+}

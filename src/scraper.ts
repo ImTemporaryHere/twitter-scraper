@@ -33,6 +33,9 @@ import {
 } from './tweets';
 import fetch from 'cross-fetch';
 import {
+  ConversationHistoryResponse,
+  fetchConversationHistory,
+  FetchConversationHistoryParams,
   getDialogs,
   InboxInitialState,
   sendMessage,
@@ -493,5 +496,18 @@ export class Scraper {
    */
   public sendMessage(body: SendMessageParams): Promise<SendMessageResponse> {
     return sendMessage(body, this.auth);
+  }
+
+  /**
+   * Fetches a conversation messages.
+   * @param {Object} params - The parameters for sending the message.
+   * @param {string} params.conversationId - The conversation id.
+   * @param {string} [params.max_id] - The ID of the message to be counted as last one.
+   * @returns {Promise<ConversationHistoryResponse>} A promise that resolves into conversation messages list.
+   */
+  public fetchConversationHistory(
+    params: FetchConversationHistoryParams,
+  ): Promise<ConversationHistoryResponse> {
+    return fetchConversationHistory(this.auth, params);
   }
 }

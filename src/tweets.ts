@@ -13,6 +13,7 @@ import {
 import { getTweetTimeline } from './timeline-async';
 import { apiRequestFactory } from './api-data';
 import { ListTimeline, parseListTimelineTweets } from './timeline-list';
+import { Headers } from 'headers-polyfill';
 
 export interface Mention {
   id: string;
@@ -346,4 +347,53 @@ export async function getTweetAnonymous(
   }
 
   return parseTimelineEntryItemContentRaw(res.value.data, id);
+}
+
+export interface CreateRetweetResponse {
+  data: {
+    create_retweet: {
+      retweet_results: {
+        result: RetweetResult;
+      };
+    };
+  };
+}
+
+interface RetweetResult {
+  rest_id: string;
+  legacy: LegacyInfo;
+}
+
+interface LegacyInfo {
+  full_text: string;
+}
+
+export async function retweetTweetById(
+  tweet_id: string,
+  auth: TwitterAuth,
+): Promise<CreateRetweetResponse> {
+  const body = {
+    variables: {
+      tweet_id: tweet_id,
+      dark_request: false,
+    },
+    queryId: 'ojPdsZsimiJrUGLR1sjUtA',
+  };
+
+  const headers = new Headers();
+  headers.set('Content-Type', 'application/json');
+
+  const res = await requestApi<CreateRetweetResponse>(
+    'https://twitter.com/i/api/graphql/ojPdsZsimiJrUGLR1sjUtA/CreateRetweet',
+    auth,
+    'POST',
+    JSON.stringify(body),
+    headers,
+  );
+
+  if (!res.success) {
+    throw res.err;
+  }
+
+  return res.value;
 }

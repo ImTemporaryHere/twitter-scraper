@@ -30,6 +30,8 @@ import {
   TweetQuery,
   getTweet,
   fetchListTweets,
+  retweetTweetById,
+  CreateRetweetResponse,
 } from './tweets';
 import fetch from 'cross-fetch';
 import {
@@ -509,5 +511,14 @@ export class Scraper {
     params: FetchConversationHistoryParams,
   ): Promise<ConversationHistoryResponse> {
     return fetchConversationHistory(this.auth, params);
+  }
+
+  /**
+   * Fetches a conversation messages.
+   * @param {string} tweet_id - tweet id to be retweeted.
+   * @returns {Promise<CreateRetweetResponse>} A promise that resolves in CreateRetweetResponse.
+   */
+  public retweetTweetById(tweet_id: string): Promise<CreateRetweetResponse> {
+    return retweetTweetById(tweet_id, this.auth);
   }
 }

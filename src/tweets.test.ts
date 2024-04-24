@@ -315,3 +315,10 @@ test('scraper can get liked tweets', async () => {
   expect(tweet.done).toBeFalsy();
   expect(tweet.value?.id).not.toBeUndefined();
 });
+
+test('scraper can retweet by tweet id', async () => {
+  const scraper = await getScraper();
+  const response = await scraper.retweetTweetById('1774205950498414983');
+  console.log(response);
+  expect(response.data.create_retweet.retweet_results.result).toBeTruthy();
+});

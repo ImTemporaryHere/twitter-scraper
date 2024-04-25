@@ -7,6 +7,7 @@ import { FetchTransformOptions } from './api';
 export interface TwitterAuthOptions {
   fetch: typeof fetch;
   transform: Partial<FetchTransformOptions>;
+  userAgent?: string;
 }
 
 export interface TwitterAuth {
@@ -95,6 +96,8 @@ export class TwitterGuestAuth implements TwitterAuth {
   protected jar: CookieJar;
   protected guestToken?: string;
   protected guestCreatedAt?: Date;
+  protected userAgent =
+    'Mozilla/5.0 (Linux; Android 11; Nokia G20) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.88 Mobile Safari/537.36';
 
   fetch: typeof fetch;
 
@@ -105,6 +108,9 @@ export class TwitterGuestAuth implements TwitterAuth {
     this.fetch = withTransform(options?.fetch ?? fetch, options?.transform);
     this.bearerToken = bearerToken;
     this.jar = new CookieJar();
+    if (options?.userAgent) {
+      this.userAgent = options.userAgent;
+    }
   }
 
   cookieJar(): CookieJar {
@@ -155,6 +161,7 @@ export class TwitterGuestAuth implements TwitterAuth {
 
     headers.set('authorization', `Bearer ${this.bearerToken}`);
     headers.set('x-guest-token', token);
+    headers.set('User-Agent', this.userAgent);
 
     const cookies = await this.jar.getCookies(url);
     const xCsrfToken = cookies.find((cookie) => cookie.key === 'ct0');

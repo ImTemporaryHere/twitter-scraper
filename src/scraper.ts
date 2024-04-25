@@ -62,6 +62,11 @@ export interface ScraperOptions {
    * proxy requests through other hosts, for example.
    */
   transform: Partial<FetchTransformOptions>;
+
+  /**
+   * User agent to be used in headers
+   */
+  userAgent?: string;
 }
 
 /**
@@ -472,6 +477,7 @@ export class Scraper {
     return {
       fetch: this.options?.fetch,
       transform: this.options?.transform,
+      userAgent: this.options?.userAgent,
     };
   }
 

@@ -397,3 +397,207 @@ export async function retweetTweetById(
 
   return res.value;
 }
+
+export interface GetUserTweetsResponse {
+  data: {
+    user: {
+      result: {
+        __typename: string;
+        timeline_v2: {
+          timeline: {
+            instructions: {
+              type: string;
+              entries?: {
+                entryId: string;
+                sortIndex: string;
+                content: {
+                  entryType: string;
+                  __typename: string;
+                  itemContent?: {
+                    itemType: string;
+                    __typename: string;
+                    tweet_results?: {
+                      result: {
+                        __typename: string;
+                        rest_id: string;
+                        core: {
+                          user_results: {
+                            result: {
+                              __typename: string;
+                              id: string;
+                              rest_id: string;
+                              profile_image_shape: string;
+                              legacy: {
+                                blocked_by: boolean;
+                                blocking: boolean;
+                                follow_request_sent: boolean;
+                                followed_by: boolean;
+                                following: boolean;
+                                muting: boolean;
+                                notifications: boolean;
+                                protected: boolean;
+                                can_dm: boolean;
+                                can_media_tag: boolean;
+                                created_at: string;
+                                default_profile: boolean;
+                                default_profile_image: boolean;
+                                description: string;
+                                entities: {
+                                  description: {
+                                    urls: any[];
+                                  };
+                                };
+                                fast_followers_count: number;
+                                favourites_count: number;
+                                followers_count: number;
+                                friends_count: number;
+                                has_custom_timelines: boolean;
+                                is_translator: boolean;
+                                listed_count: number;
+                                location: string;
+                                media_count: number;
+                                name: string;
+                                normal_followers_count: number;
+                                pinned_tweet_ids_str: string[];
+                                possibly_sensitive: boolean;
+                                profile_image_url_https: string;
+                                profile_interstitial_type: string;
+                                screen_name: string;
+                                statuses_count: number;
+                                translator_type: string;
+                                verified: boolean;
+                                want_retweets: boolean;
+                                withheld_in_countries: string[];
+                              };
+                            };
+                          };
+                        };
+                        edit_control: {
+                          edit_tweet_ids: string[];
+                          editable_until_msecs: string;
+                          is_edit_eligible: boolean;
+                          edits_remaining: string;
+                        };
+                        source: string;
+                        legacy: {
+                          bookmark_count: number;
+                          bookmarked: boolean;
+                          created_at: string;
+                          conversation_id_str: string;
+                          display_text_range: number[];
+                          favorite_count: number;
+                          favorited: boolean;
+                          full_text: string;
+                          is_quote_status: boolean;
+                          lang: string;
+                          possibly_sensitive: boolean;
+                          possibly_sensitive_editable: true;
+                          quote_count: number;
+                          reply_count: number;
+                          retweet_count: number;
+                          retweeted: boolean;
+                          user_id_str: string;
+                          id_str: string;
+                        };
+                      };
+                    };
+                    tweetDisplayType: string;
+                  };
+                  clientEventInfo?: {
+                    component: string;
+                    element: string;
+                    details: {
+                      timelinesDetails: {
+                        injectionType: string;
+                        controllerData: string;
+                      };
+                    };
+                  };
+                  value?: string;
+                  cursorType?: string;
+                };
+              };
+            };
+            metadata: {
+              scribeConfig: {
+                page: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+}
+
+export interface GetUserTweetsParams {
+  userId: string;
+  cursor?: string;
+}
+
+export async function getUserTweets(
+  auth: TwitterAuth,
+  { userId, cursor }: GetUserTweetsParams,
+): Promise<GetUserTweetsResponse> {
+  const rawParams = {
+    variables: {
+      userId,
+      count: 20,
+      cursor,
+      includePromotedContent: false, //
+      withQuickPromoteEligibilityTweetFields: false, //
+      withVoice: false, //
+      withV2Timeline: true,
+    },
+    features: {
+      rweb_tipjar_consumption_enabled: false, //
+      responsive_web_graphql_exclude_directive_enabled: false, //
+      verified_phone_label_enabled: false,
+      creator_subscriptions_tweet_preview_api_enabled: false, //
+      responsive_web_graphql_timeline_navigation_enabled: true,
+      responsive_web_graphql_skip_user_profile_image_extensions_enabled: true, //
+      communities_web_enable_tweet_community_results_fetch: false, //
+      c9s_tweet_anatomy_moderator_badge_enabled: false, //
+      articles_preview_enabled: false, //
+      tweetypie_unmention_optimization_enabled: true,
+      responsive_web_edit_tweet_api_enabled: true,
+      graphql_is_translatable_rweb_tweet_is_translatable_enabled: true,
+      view_counts_everywhere_api_enabled: false, //
+      longform_notetweets_consumption_enabled: false, //
+      responsive_web_twitter_article_tweet_consumption_enabled: false, //
+      tweet_awards_web_tipping_enabled: false,
+      creator_subscriptions_quote_tweet_preview_enabled: false,
+      freedom_of_speech_not_reach_fetch_enabled: true,
+      standardized_nudges_misinfo: true,
+      tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled:
+        false, //
+      tweet_with_visibility_results_prefer_gql_media_interstitial_enabled:
+        false, //
+      rweb_video_timestamps_enabled: false, //
+      longform_notetweets_rich_text_read_enabled: false, //
+      longform_notetweets_inline_media_enabled: false, //
+      responsive_web_enhance_cards_enabled: false,
+    },
+    fieldToggles: {
+      withArticlePlainText: false,
+    },
+  };
+
+  const builtParams = Object.entries(rawParams).reduce((a, [k, v]) => {
+    a[k] = JSON.stringify(v);
+    return a;
+  }, {} as Record<string, string>);
+
+  const queryParams = new URLSearchParams(builtParams);
+
+  const res = await requestApi<GetUserTweetsResponse>(
+    `https://twitter.com/i/api/graphql/9zyyd1hebl7oNWIPdA8HRw/UserTweets?${queryParams.toString()}`,
+    auth,
+  );
+
+  if (!res.success) {
+    throw res.err;
+  }
+
+  return res.value;
+}

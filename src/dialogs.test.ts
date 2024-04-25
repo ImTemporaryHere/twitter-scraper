@@ -54,6 +54,4 @@ test('scraper can fetch conversation history', async () => {
   });
 
   expect(response).toBeTruthy();
-
-  console.log(JSON.stringify(response));
 });

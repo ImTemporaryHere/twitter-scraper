@@ -32,6 +32,9 @@ import {
   fetchListTweets,
   retweetTweetById,
   CreateRetweetResponse,
+  getUserTweets,
+  GetUserTweetsResponse,
+  GetUserTweetsParams,
 } from './tweets';
 import fetch from 'cross-fetch';
 import {
@@ -520,5 +523,18 @@ export class Scraper {
    */
   public retweetTweetById(tweet_id: string): Promise<CreateRetweetResponse> {
     return retweetTweetById(tweet_id, this.auth);
+  }
+
+  /**
+   * Fetches tweets by user id.
+   * @param {Object} params - object which contains params for fetching user tweets.
+   * @param {string} params.userId - user id whose tweets to fetch.
+   * @param {string} params.cursor - bottom or top cursor (taken from previous response), its like scrolling the user's page - to get next or previous tweets.
+   * @returns {Promise<GetUserTweetsResponse>} A promise that resolves in CreateRetweetResponse.
+   */
+  public getUserTweets(
+    params: GetUserTweetsParams,
+  ): Promise<GetUserTweetsResponse> {
+    return getUserTweets(this.auth, params);
   }
 }

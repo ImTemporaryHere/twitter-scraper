@@ -319,6 +319,15 @@ test('scraper can get liked tweets', async () => {
 test('scraper can retweet by tweet id', async () => {
   const scraper = await getScraper();
   const response = await scraper.retweetTweetById('1774205950498414983');
-  console.log(response);
   expect(response.data.create_retweet.retweet_results.result).toBeTruthy();
+});
+
+test('scraper can get user tweets', async () => {
+  const scraper = await getScraper();
+  const response = await scraper.getUserTweets({
+    userId: '1655150321079840771',
+  });
+  expect(
+    response.data.user.result.timeline_v2.timeline.instructions,
+  ).toBeTruthy();
 });

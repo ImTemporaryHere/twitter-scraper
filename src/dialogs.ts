@@ -401,6 +401,7 @@ export async function sendMessage(
 export interface FetchConversationHistoryParams {
   conversationId: string;
   max_id?: string;
+  min_id?: string;
 }
 
 export interface ConversationHistoryResponse {
@@ -484,7 +485,7 @@ interface UserProfile {
 
 export async function fetchConversationHistory(
   auth: TwitterAuth,
-  { max_id, conversationId }: FetchConversationHistoryParams,
+  { min_id, max_id, conversationId }: FetchConversationHistoryParams,
 ): Promise<ConversationHistoryResponse> {
   const params = new URLSearchParams({
     // max_id, //id of the last message
@@ -522,6 +523,10 @@ export async function fetchConversationHistory(
 
   if (max_id) {
     params.set('max_id', max_id);
+  }
+
+  if (min_id) {
+    params.set('min_id', min_id);
   }
 
   const res = await requestApi<ConversationHistoryResponse>(

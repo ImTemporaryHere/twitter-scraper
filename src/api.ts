@@ -90,6 +90,9 @@ export async function requestApi<T>(
         const currentTime = new Date().valueOf() / 1000;
         const timeDeltaMs = 1000 * (parseInt(xRateLimitReset) - currentTime);
 
+        console.log(
+          `rate limit, wait for ${(timeDeltaMs * 1000) / 60} minutes`,
+        );
         // I have seen this block for 800s (~13 *minutes*)
         await new Promise((resolve) => setTimeout(resolve, timeDeltaMs));
       }

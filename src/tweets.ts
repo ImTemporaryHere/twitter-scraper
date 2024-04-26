@@ -398,126 +398,16 @@ export async function retweetTweetById(
   return res.value;
 }
 
-export interface GetUserTweetsResponse {
+export type GetUserTweetsResponse = {
   data: {
     user: {
       result: {
         __typename: string;
         timeline_v2: {
           timeline: {
-            instructions: {
-              type: string;
-              entries?: {
-                entryId: string;
-                sortIndex: string;
-                content: {
-                  entryType: string;
-                  __typename: string;
-                  itemContent?: {
-                    itemType: string;
-                    __typename: string;
-                    tweet_results?: {
-                      result: {
-                        __typename: string;
-                        rest_id: string;
-                        core: {
-                          user_results: {
-                            result: {
-                              __typename: string;
-                              id: string;
-                              rest_id: string;
-                              profile_image_shape: string;
-                              legacy: {
-                                blocked_by: boolean;
-                                blocking: boolean;
-                                follow_request_sent: boolean;
-                                followed_by: boolean;
-                                following: boolean;
-                                muting: boolean;
-                                notifications: boolean;
-                                protected: boolean;
-                                can_dm: boolean;
-                                can_media_tag: boolean;
-                                created_at: string;
-                                default_profile: boolean;
-                                default_profile_image: boolean;
-                                description: string;
-                                entities: {
-                                  description: {
-                                    urls: any[];
-                                  };
-                                };
-                                fast_followers_count: number;
-                                favourites_count: number;
-                                followers_count: number;
-                                friends_count: number;
-                                has_custom_timelines: boolean;
-                                is_translator: boolean;
-                                listed_count: number;
-                                location: string;
-                                media_count: number;
-                                name: string;
-                                normal_followers_count: number;
-                                pinned_tweet_ids_str: string[];
-                                possibly_sensitive: boolean;
-                                profile_image_url_https: string;
-                                profile_interstitial_type: string;
-                                screen_name: string;
-                                statuses_count: number;
-                                translator_type: string;
-                                verified: boolean;
-                                want_retweets: boolean;
-                                withheld_in_countries: string[];
-                              };
-                            };
-                          };
-                        };
-                        edit_control: {
-                          edit_tweet_ids: string[];
-                          editable_until_msecs: string;
-                          is_edit_eligible: boolean;
-                          edits_remaining: string;
-                        };
-                        source: string;
-                        legacy: {
-                          bookmark_count: number;
-                          bookmarked: boolean;
-                          created_at: string;
-                          conversation_id_str: string;
-                          display_text_range: number[];
-                          favorite_count: number;
-                          favorited: boolean;
-                          full_text: string;
-                          is_quote_status: boolean;
-                          lang: string;
-                          possibly_sensitive: boolean;
-                          possibly_sensitive_editable: true;
-                          quote_count: number;
-                          reply_count: number;
-                          retweet_count: number;
-                          retweeted: boolean;
-                          user_id_str: string;
-                          id_str: string;
-                        };
-                      };
-                    };
-                    tweetDisplayType: string;
-                  };
-                  clientEventInfo?: {
-                    component: string;
-                    element: string;
-                    details: {
-                      timelinesDetails: {
-                        injectionType: string;
-                        controllerData: string;
-                      };
-                    };
-                  };
-                  value?: string;
-                  cursorType?: string;
-                };
-              };
-            };
+            instructions: Array<
+              TimelinePinEntryInstruction | TimelineAddEntriesInstruction
+            >;
             metadata: {
               scribeConfig: {
                 page: string;
@@ -528,7 +418,90 @@ export interface GetUserTweetsResponse {
       };
     };
   };
-}
+};
+
+export type TimelinePinEntryInstruction = {
+  type: 'TimelinePinEntry';
+  entry: {
+    entryId: string;
+    sortIndex: string;
+    content: TweetContent;
+  };
+};
+
+export type TimelineAddEntriesInstruction = {
+  type: 'TimelineAddEntries';
+  entries: Array<{
+    entryId: string;
+    sortIndex: string;
+    content: TweetContent;
+  }>;
+};
+
+type TweetContent = {
+  entryType: string;
+  __typename: string;
+  itemContent: {
+    itemType: string;
+    __typename: string;
+    tweet_results: {
+      result: TweetResult;
+    };
+    // Define other properties as needed
+  };
+};
+
+type TweetResult = {
+  __typename: string;
+  rest_id: string;
+  core: {
+    user_results: {
+      result: {
+        __typename: string;
+        id: string;
+        rest_id: string;
+        affiliates_highlighted_label: any;
+        has_graduated_access: boolean;
+        is_blue_verified: boolean;
+        profile_image_shape: string;
+        legacy: LegacyUser;
+        tipjar_settings: Record<string, any>;
+      };
+    };
+  };
+  legacy: {
+    bookmark_count: number;
+    bookmarked: boolean;
+    created_at: string;
+    conversation_id_str: string;
+    display_text_range: [number, number];
+    entities: {
+      hashtags: string[];
+      symbols: string[];
+      timestamps: any[]; // You might want to define a type for timestamps
+      urls: string[];
+      user_mentions: string[];
+    };
+    favorite_count: number;
+    favorited: boolean;
+    full_text: string;
+    is_quote_status: boolean;
+    lang: string;
+    quote_count: number;
+    reply_count: number;
+    retweet_count: number;
+    retweeted: boolean;
+    user_id_str: string;
+    id_str: string;
+  };
+};
+
+type LegacyUser = {
+  followed_by: boolean;
+  following: boolean;
+  can_dm: boolean;
+  // Define other properties as needed
+};
 
 export interface GetUserTweetsParams {
   userId: string;

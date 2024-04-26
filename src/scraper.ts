@@ -513,7 +513,8 @@ export class Scraper {
    * Fetches a conversation messages.
    * @param {Object} params - The parameters for sending the message.
    * @param {string} params.conversationId - The conversation id.
-   * @param {string} [params.max_id] - The ID of the message to be counted as last one.
+   * @param {string} [params.max_id] - The ID of the message to be counted as last one seen.
+   * @param {string} [params.min_id] - The ID of the message to be counted as first one seen.
    * @returns {Promise<ConversationHistoryResponse>} A promise that resolves into conversation messages list.
    */
   public fetchConversationHistory(

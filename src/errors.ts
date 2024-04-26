@@ -5,6 +5,7 @@ export class ApiError extends Error {
     message: string,
   ) {
     super(message);
+    console.log('data-', this.data);
   }
 
   static async fromResponse(response: Response) {

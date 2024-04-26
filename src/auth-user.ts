@@ -134,6 +134,7 @@ export class TwitterUserAuth extends TwitterGuestAuth {
   async installTo(headers: Headers, url: string): Promise<void> {
     headers.set('authorization', `Bearer ${this.bearerToken}`);
     headers.set('cookie', await this.jar.getCookieString(url));
+    headers.set('User-Agent', this.userAgent);
     await this.installCsrfToken(headers);
   }
 
@@ -291,8 +292,7 @@ export class TwitterUserAuth extends TwitterGuestAuth {
       authorization: `Bearer ${this.bearerToken}`,
       cookie: await this.jar.getCookieString(onboardingTaskUrl),
       'content-type': 'application/json',
-      'User-Agent':
-        'Mozilla/5.0 (Linux; Android 11; Nokia G20) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.88 Mobile Safari/537.36',
+      'User-Agent': this.userAgent,
       'x-guest-token': token,
       'x-twitter-auth-type': 'OAuth2Client',
       'x-twitter-active-user': 'yes',

@@ -44,13 +44,16 @@ export type RequestApiResult<T> =
  * @param url - The URL to send the request to.
  * @param auth - The instance of {@link TwitterAuth} that will be used to authorize this request.
  * @param method - The HTTP method used when sending this request.
+ * @param body
  */
 export async function requestApi<T>(
   url: string,
   auth: TwitterAuth,
   method: 'GET' | 'POST' = 'GET',
+  body?: BodyInit,
+  customHeaders?: Headers,
 ): Promise<RequestApiResult<T>> {
-  const headers = new Headers();
+  const headers = customHeaders ?? new Headers();
   await auth.installTo(headers, url);
 
   let res: Response;
@@ -59,6 +62,7 @@ export async function requestApi<T>(
       res = await auth.fetch(url, {
         method,
         headers,
+        body,
       });
     } catch (err) {
       if (!(err instanceof Error)) {
@@ -86,6 +90,9 @@ export async function requestApi<T>(
         const currentTime = new Date().valueOf() / 1000;
         const timeDeltaMs = 1000 * (parseInt(xRateLimitReset) - currentTime);
 
+        console.log(
+          `rate limit, wait for ${(timeDeltaMs * 1000) / 60} minutes`,
+        );
         // I have seen this block for 800s (~13 *minutes*)
         await new Promise((resolve) => setTimeout(resolve, timeDeltaMs));
       }
@@ -99,13 +106,15 @@ export async function requestApi<T>(
     };
   }
 
-  const value: T = await res.json();
   if (res.headers.get('x-rate-limit-incoming') == '0') {
     auth.deleteToken();
-    return { success: true, value };
-  } else {
-    return { success: true, value };
   }
+
+  let value;
+  try {
+    value = await res.json();
+  } catch (e) {}
+  return { success: true, value };
 }
 
 /** @internal */

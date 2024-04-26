@@ -13,6 +13,7 @@ import {
 import { getTweetTimeline } from './timeline-async';
 import { apiRequestFactory } from './api-data';
 import { ListTimeline, parseListTimelineTweets } from './timeline-list';
+import { Headers } from 'headers-polyfill';
 
 export interface Mention {
   id: string;
@@ -346,4 +347,230 @@ export async function getTweetAnonymous(
   }
 
   return parseTimelineEntryItemContentRaw(res.value.data, id);
+}
+
+export interface CreateRetweetResponse {
+  data: {
+    create_retweet: {
+      retweet_results: {
+        result: RetweetResult;
+      };
+    };
+  };
+}
+
+interface RetweetResult {
+  rest_id: string;
+  legacy: LegacyInfo;
+}
+
+interface LegacyInfo {
+  full_text: string;
+}
+
+export async function retweetTweetById(
+  tweet_id: string,
+  auth: TwitterAuth,
+): Promise<CreateRetweetResponse> {
+  const body = {
+    variables: {
+      tweet_id: tweet_id,
+      dark_request: false,
+    },
+    queryId: 'ojPdsZsimiJrUGLR1sjUtA',
+  };
+
+  const headers = new Headers();
+  headers.set('Content-Type', 'application/json');
+
+  const res = await requestApi<CreateRetweetResponse>(
+    'https://twitter.com/i/api/graphql/ojPdsZsimiJrUGLR1sjUtA/CreateRetweet',
+    auth,
+    'POST',
+    JSON.stringify(body),
+    headers,
+  );
+
+  if (!res.success) {
+    throw res.err;
+  }
+
+  return res.value;
+}
+
+export type GetUserTweetsResponse = {
+  data: {
+    user: {
+      result: {
+        __typename: string;
+        timeline_v2: {
+          timeline: {
+            instructions: Array<
+              TimelinePinEntryInstruction | TimelineAddEntriesInstruction
+            >;
+            metadata: {
+              scribeConfig: {
+                page: string;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+};
+
+export type TimelinePinEntryInstruction = {
+  type: 'TimelinePinEntry';
+  entry: {
+    entryId: string;
+    sortIndex: string;
+    content: TweetContent;
+  };
+};
+
+export type TimelineAddEntriesInstruction = {
+  type: 'TimelineAddEntries';
+  entries: Array<{
+    entryId: string;
+    sortIndex: string;
+    content: TweetContent;
+  }>;
+};
+
+type TweetContent = {
+  entryType: string;
+  __typename: string;
+  itemContent: {
+    itemType: string;
+    __typename: string;
+    tweet_results: {
+      result: TweetResult;
+    };
+    // Define other properties as needed
+  };
+};
+
+type TweetResult = {
+  __typename: string;
+  rest_id: string;
+  core: {
+    user_results: {
+      result: {
+        __typename: string;
+        id: string;
+        rest_id: string;
+        affiliates_highlighted_label: any;
+        has_graduated_access: boolean;
+        is_blue_verified: boolean;
+        profile_image_shape: string;
+        legacy: LegacyUser;
+        tipjar_settings: Record<string, any>;
+      };
+    };
+  };
+  legacy: {
+    bookmark_count: number;
+    bookmarked: boolean;
+    created_at: string;
+    conversation_id_str: string;
+    display_text_range: [number, number];
+    entities: {
+      hashtags: string[];
+      symbols: string[];
+      timestamps: any[]; // You might want to define a type for timestamps
+      urls: string[];
+      user_mentions: string[];
+    };
+    favorite_count: number;
+    favorited: boolean;
+    full_text: string;
+    is_quote_status: boolean;
+    lang: string;
+    quote_count: number;
+    reply_count: number;
+    retweet_count: number;
+    retweeted: boolean;
+    user_id_str: string;
+    id_str: string;
+  };
+};
+
+type LegacyUser = {
+  followed_by: boolean;
+  following: boolean;
+  can_dm: boolean;
+  // Define other properties as needed
+};
+
+export interface GetUserTweetsParams {
+  userId: string;
+  cursor?: string;
+}
+
+export async function getUserTweets(
+  auth: TwitterAuth,
+  { userId, cursor }: GetUserTweetsParams,
+): Promise<GetUserTweetsResponse> {
+  const rawParams = {
+    variables: {
+      userId,
+      count: 20,
+      cursor,
+      includePromotedContent: false, //
+      withQuickPromoteEligibilityTweetFields: false, //
+      withVoice: false, //
+      withV2Timeline: true,
+    },
+    features: {
+      rweb_tipjar_consumption_enabled: false, //
+      responsive_web_graphql_exclude_directive_enabled: false, //
+      verified_phone_label_enabled: false,
+      creator_subscriptions_tweet_preview_api_enabled: false, //
+      responsive_web_graphql_timeline_navigation_enabled: true,
+      responsive_web_graphql_skip_user_profile_image_extensions_enabled: true, //
+      communities_web_enable_tweet_community_results_fetch: false, //
+      c9s_tweet_anatomy_moderator_badge_enabled: false, //
+      articles_preview_enabled: false, //
+      tweetypie_unmention_optimization_enabled: true,
+      responsive_web_edit_tweet_api_enabled: true,
+      graphql_is_translatable_rweb_tweet_is_translatable_enabled: true,
+      view_counts_everywhere_api_enabled: false, //
+      longform_notetweets_consumption_enabled: false, //
+      responsive_web_twitter_article_tweet_consumption_enabled: false, //
+      tweet_awards_web_tipping_enabled: false,
+      creator_subscriptions_quote_tweet_preview_enabled: false,
+      freedom_of_speech_not_reach_fetch_enabled: true,
+      standardized_nudges_misinfo: true,
+      tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled:
+        false, //
+      tweet_with_visibility_results_prefer_gql_media_interstitial_enabled:
+        false, //
+      rweb_video_timestamps_enabled: false, //
+      longform_notetweets_rich_text_read_enabled: false, //
+      longform_notetweets_inline_media_enabled: false, //
+      responsive_web_enhance_cards_enabled: false,
+    },
+    fieldToggles: {
+      withArticlePlainText: false,
+    },
+  };
+
+  const builtParams = Object.entries(rawParams).reduce((a, [k, v]) => {
+    a[k] = JSON.stringify(v);
+    return a;
+  }, {} as Record<string, string>);
+
+  const queryParams = new URLSearchParams(builtParams);
+
+  const res = await requestApi<GetUserTweetsResponse>(
+    `https://twitter.com/i/api/graphql/9zyyd1hebl7oNWIPdA8HRw/UserTweets?${queryParams.toString()}`,
+    auth,
+  );
+
+  if (!res.success) {
+    throw res.err;
+  }
+
+  return res.value;
 }

@@ -1,5 +1,7 @@
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { Scraper } from './scraper';
+import fs from 'fs/promises';
+import * as tough from 'tough-cookie';
 
 export interface ScraperTestOptions {
   /**

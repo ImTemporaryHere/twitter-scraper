@@ -30,8 +30,23 @@ import {
   TweetQuery,
   getTweet,
   fetchListTweets,
+  retweetTweetById,
+  CreateRetweetResponse,
+  getUserTweets,
+  GetUserTweetsResponse,
+  GetUserTweetsParams,
 } from './tweets';
 import fetch from 'cross-fetch';
+import {
+  ConversationHistoryResponse,
+  fetchConversationHistory,
+  FetchConversationHistoryParams,
+  getDialogs,
+  InboxInitialState,
+  sendMessage,
+  SendMessageParams,
+  SendMessageResponse,
+} from './dialogs';
 
 const twUrl = 'https://twitter.com';
 
@@ -47,6 +62,11 @@ export interface ScraperOptions {
    * proxy requests through other hosts, for example.
    */
   transform: Partial<FetchTransformOptions>;
+
+  /**
+   * User agent to be used in headers
+   */
+  userAgent?: string;
 }
 
 /**
@@ -457,6 +477,7 @@ export class Scraper {
     return {
       fetch: this.options?.fetch,
       transform: this.options?.transform,
+      userAgent: this.options?.userAgent,
     };
   }
 
@@ -466,5 +487,61 @@ export class Scraper {
     }
 
     return res.value;
+  }
+
+  /**
+   * Fetches user dialogs list.
+   * @returns {Promise<InboxInitialState>} object.
+   */
+  public getDialogs(): Promise<InboxInitialState> {
+    return getDialogs(this.auth);
+  }
+
+  /**
+   * Sends a message in a conversation.
+   * @param {Object} body - The parameters for sending the message.
+   * @param {string} body.conversation_id - The ID of the recipient.
+   * @param {string} [body.text] - The text of the message optional.
+   * @param {string} [body.absolutePathToMedia] - The absolute path to gif/video to be send optional.
+   * @returns {Promise<SendMessageResponse>} A promise that resolves with the result of sending the message.
+   */
+  public sendMessage(body: SendMessageParams): Promise<SendMessageResponse> {
+    return sendMessage(body, this.auth);
+  }
+
+  /**
+   * Fetches a conversation messages.
+   * @param {Object} params - The parameters for sending the message.
+   * @param {string} params.conversationId - The conversation id.
+   * @param {string} [params.max_id] - The ID of the message to be counted as last one seen.
+   * @param {string} [params.min_id] - The ID of the message to be counted as first one seen.
+   * @returns {Promise<ConversationHistoryResponse>} A promise that resolves into conversation messages list.
+   */
+  public fetchConversationHistory(
+    params: FetchConversationHistoryParams,
+  ): Promise<ConversationHistoryResponse> {
+    return fetchConversationHistory(this.auth, params);
+  }
+
+  /**
+   * Fetches a conversation messages.
+   * @param {string} tweet_id - tweet id to be retweeted.
+   * @returns {Promise<CreateRetweetResponse>} A promise that resolves in CreateRetweetResponse.
+   */
+  public retweetTweetById(tweet_id: string): Promise<CreateRetweetResponse> {
+    return retweetTweetById(tweet_id, this.auth);
+  }
+
+  /**
+   * Fetches tweets by user id.
+   * @param {Object} params - object which contains params for fetching user tweets.
+   * @param {string} params.userId - user id whose tweets to fetch.
+   * @param {string} params.cursor - bottom or top cursor (taken from previous response), its like scrolling the user's page - to get next or previous tweets.
+   * @returns {Promise<GetUserTweetsResponse>} A promise that resolves in CreateRetweetResponse.
+   */
+  public getUserTweets(
+    params: GetUserTweetsParams,
+  ): Promise<GetUserTweetsResponse> {
+    return getUserTweets(this.auth, params);
   }
 }

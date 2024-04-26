@@ -117,3 +117,7 @@ docs/
 
 # NPM lockfile
 package-lock.json
+
+cookies.json
+
+gif-for-message.mp4

@@ -10,6 +10,9 @@
   "version": "0.12.0",
   "main": "dist/_module.js",
   "repository": "https://github.com/ImTemporaryHere/twitter-scraper.git",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "author": "ImTemporaryHere",
   "license": "MIT",
   "engines": {

@@ -7,7 +7,7 @@
     "scraper",
     "crawler"
   ],
-  "version": "0.12.0",
+  "version": "0.12.1",
   "main": "dist/_module.js",
   "repository": "https://github.com/ImTemporaryHere/twitter-scraper.git",
   "publishConfig": {

@@ -58,7 +58,7 @@ export async function uploadMedia(
     await new Promise((res) =>
       setTimeout(() => {
         res(1);
-      }, finalizeResponse.processing_info.check_after_secs * 1000),
+      }, finalizeResponse.processing_info.check_after_secs * 1000 + 200),
     );
     const uploadStatusResponse = await uploadStatus(
       auth,

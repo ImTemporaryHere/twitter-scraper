@@ -86,6 +86,7 @@ export async function requestApi<T>(
       */
       const xRateLimitRemaining = res.headers.get('x-rate-limit-remaining');
       const xRateLimitReset = res.headers.get('x-rate-limit-reset');
+      console.log('xRateLimitRemaining', xRateLimitRemaining);
       if (xRateLimitRemaining == '0' && xRateLimitReset) {
         const currentTime = new Date().valueOf() / 1000;
         const timeDeltaMs = 1000 * (parseInt(xRateLimitReset) - currentTime);
@@ -100,9 +101,20 @@ export async function requestApi<T>(
   } while (res.status === 429);
 
   if (!res.ok) {
+    const err = await ApiError.fromResponse(res);
+
+    if (err.data?.errors?.find((e: any) => e?.code == 226)) {
+      console.log(
+        'automated req error, lets  wait  for 10 minuts before trying again',
+      );
+      await new Promise((resolve) =>
+        setTimeout(() => resolve(1), 1000 * 60 * 10),
+      );
+    }
+
     return {
       success: false,
-      err: await ApiError.fromResponse(res),
+      err,
     };
   }
 

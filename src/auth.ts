@@ -83,7 +83,23 @@ function withTransform(
       input,
       init,
     ];
-    const res = await fetchFn(...fetchArgs);
+
+    // Promise that resolves when either the fetch operation completes or the timeout is reached
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error('Request timed out after 60 seconds'));
+      }, 60000); // 60 seconds
+    });
+
+    // Use Promise.race to wait for either the fetch or the timeout
+    const res = await Promise.race([
+      fetchFn(...fetchArgs),
+      timeoutPromise,
+    ]).catch((err) => {
+      // If an error is caught, rethrow it
+      throw err;
+    });
+
     return (await transform?.response?.(res)) ?? res;
   };
 }

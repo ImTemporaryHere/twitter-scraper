@@ -373,9 +373,9 @@ export async function sendMessage(
   };
 
   if (absolutePathToMedia) {
+
     const media_id = await uploadMedia(
       {
-        media_category: 'dm_video',
         absolutePathToFile: absolutePathToMedia,
       },
       auth,

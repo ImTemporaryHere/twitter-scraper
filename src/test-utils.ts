@@ -21,7 +21,7 @@ export async function getScraper(
   const twoFactorSecret = process.env['TWITTER_2FA_SECRET'];
   const proxyUrl = process.env['PROXY_URL'];
   // const cookies = process.env['TWITTER_COOKIES'];
-  const cookies = await getCookiesIfExist()
+  const cookies = await getCookiesIfExist();
   let agent: any;
 
   if (options.authMethod === 'cookies' && !cookies) {
@@ -71,16 +71,16 @@ export async function getScraper(
 
 export async function getCookiesIfExist() {
   try {
-    const cookiesFilePath = 'cookies.json'
-    const cookiesString = await fs.readFile(cookiesFilePath, { encoding: 'utf8' });
-    const cookies = JSON.parse(
-      cookiesString
-    ).map((i: any) => new tough.Cookie(i));
-    return cookies
+    const cookiesFilePath = 'cookies.json';
+    const cookiesString = await fs.readFile(cookiesFilePath, {
+      encoding: 'utf8',
+    });
+    const cookies = JSON.parse(cookiesString).map(
+      (i: any) => new tough.Cookie(i),
+    );
+    return cookies;
+  } catch (e) {
+    console.warn(e);
+    return undefined;
   }
-  catch (e) {
-    console.warn(e)
-    return undefined
-  }
-
 }

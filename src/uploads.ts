@@ -27,7 +27,7 @@ export async function uploadMedia(
 
   const fileStats = await fs.stat(absolutePathToFile);
 
-  const initParams:UploadInitParams = {
+  const initParams: UploadInitParams = {
     media_category: getMediaCategory(media_type),
     media_type,
     total_bytes: fileStats.size.toString(),
@@ -69,21 +69,26 @@ export async function uploadMedia(
   return uploadInitResponse.media_id_string;
 }
 
-
-function getMediaCategory(media_type: string): UploadInitParams['media_category'] {
-
-  const mediaCategoriesMaping: Record<string, UploadInitParams['media_category']> = {
+function getMediaCategory(
+  media_type: string,
+): UploadInitParams['media_category'] {
+  const mediaCategoriesMaping: Record<
+    string,
+    UploadInitParams['media_category']
+  > = {
     'image/gif': 'dm_gif',
-    video: 'dm_video'
+    video: 'dm_video',
+  };
+
+  const key = Object.keys(mediaCategoriesMaping).find((key) =>
+    media_type.includes(key),
+  );
+
+  if (!key) {
+    throw new Error('could not define media_categor');
   }
 
-  const key = Object.keys(mediaCategoriesMaping).find((key)=>media_type.includes(key))
-
-  if(!key) {
-    throw new Error('could not define media_categor')
-  }
-
-  return mediaCategoriesMaping[key]
+  return mediaCategoriesMaping[key];
 }
 
 interface UploadInitParams {

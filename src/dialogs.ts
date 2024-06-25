@@ -2,6 +2,8 @@ import { TwitterAuth } from './auth';
 import { requestApi } from './api';
 import { v1 } from 'uuid';
 import { uploadMedia } from './uploads';
+import { getProfile } from './profile';
+import { Headers } from 'headers-polyfill';
 
 interface MessageData {
   id: string;
@@ -373,7 +375,6 @@ export async function sendMessage(
   };
 
   if (absolutePathToMedia) {
-
     const media_id = await uploadMedia(
       {
         absolutePathToFile: absolutePathToMedia,
@@ -532,6 +533,55 @@ export async function fetchConversationHistory(
   const res = await requestApi<ConversationHistoryResponse>(
     `https://twitter.com/i/api/1.1/dm/conversation/${conversationId}.json?${params.toString()}`,
     auth,
+  );
+
+  if (!res.success) {
+    throw res.err;
+  }
+
+  return res.value;
+}
+
+type AddParticipantsResponse = {
+  data: {
+    add_participants: {
+      __typename: 'AddParticipantsSuccess';
+      added_users: string[];
+      participants_join_event: {
+        dm_event_results: {
+          result: {
+            __typename: 'DMEvent';
+            rest_id: string;
+            id: string;
+          };
+          id: string;
+        };
+      };
+    };
+  };
+};
+
+export async function addParticipantToGroupConversation(
+  userIdsList: string[],
+  conversationId: string,
+  auth: TwitterAuth,
+) {
+  const body = {
+    variables: {
+      addedParticipants: userIdsList,
+      conversationId,
+    },
+    queryId: 'oBwyQ0_xVbAQ8FAyG0pCRA',
+  };
+
+  const headers = new Headers();
+  headers.set('Content-Type', 'application/json');
+  const res = await requestApi<AddParticipantsResponse>(
+    `https://twitter.com/i/api/graphql/oBwyQ0_xVbAQ8FAyG0pCRA/AddParticipantsMutation`,
+    auth,
+    'POST',
+    JSON.stringify(body),
+    headers,
   );
 
   if (!res.success) {

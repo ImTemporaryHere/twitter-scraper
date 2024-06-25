@@ -89,3 +89,8 @@ test('scraper can get profile by screen name', async () => {
   const scraper = await getScraper();
   await scraper.getProfile('Twitter');
 });
+
+test('scraper can subscribe on profile', async () => {
+  const scraper = await getScraper();
+  await scraper.subscribeOnProfile('1759623353147547648');
+});

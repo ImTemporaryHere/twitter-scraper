@@ -2,7 +2,12 @@ import { Cookie } from 'tough-cookie';
 import { bearerToken, FetchTransformOptions, RequestApiResult } from './api';
 import { TwitterAuth, TwitterAuthOptions, TwitterGuestAuth } from './auth';
 import { TwitterUserAuth } from './auth-user';
-import { getProfile, getUserIdByScreenName, Profile } from './profile';
+import {
+  getProfile,
+  getUserIdByScreenName,
+  Profile,
+  subscribeOnProfile,
+} from './profile';
 import {
   fetchSearchProfiles,
   fetchSearchTweets,
@@ -38,6 +43,7 @@ import {
 } from './tweets';
 import fetch from 'cross-fetch';
 import {
+  addParticipantToGroupConversation,
   ConversationHistoryResponse,
   fetchConversationHistory,
   FetchConversationHistoryParams,
@@ -499,6 +505,10 @@ export class Scraper {
 
   /**
    * Sends a message in a conversation.
+   * you can start new conversation getting its id with as follows:
+   * const conversation_id = [receiverId, currentUserId]
+   *     .sort((a, b) => parseInt(a) - parseInt(b))
+   *     .join('-');
    * @param {Object} body - The parameters for sending the message.
    * @param {string} body.conversation_id - The ID of the recipient.
    * @param {string} [body.text] - The text of the message optional.
@@ -543,5 +553,31 @@ export class Scraper {
     params: GetUserTweetsParams,
   ): Promise<GetUserTweetsResponse> {
     return getUserTweets(this.auth, params);
+  }
+
+  /**
+   * subscribes on a profile.
+   * @param userId The Twitter userId of the profile to subscribe on.
+   * @returns The requested {@link TwitterUser}.
+   */
+  public async subscribeOnProfile(userId: string) {
+    return subscribeOnProfile(userId, this.auth);
+  }
+
+  /**
+   * adds Participant To Group Conversation.
+   * @param userIdsList The Twitter userIdsList of the profiles to be added in a conversation.
+   * @param conversationid conversation's id participant should be added in.
+   * @returns The requested {@link TwitterUser}.
+   */
+  public async addParticipantToGroupConversation(
+    userIdsList: string[],
+    conversationid: string,
+  ) {
+    return addParticipantToGroupConversation(
+      userIdsList,
+      conversationid,
+      this.auth,
+    );
   }
 }

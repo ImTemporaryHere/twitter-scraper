@@ -63,7 +63,7 @@ export async function requestApi<T>(
         method,
         headers,
         body,
-        signal: AbortSignal.timeout(60_000)
+        signal: AbortSignal.timeout(60_000),
       });
     } catch (err) {
       if (!(err instanceof Error)) {
@@ -87,9 +87,11 @@ export async function requestApi<T>(
       */
       const xRateLimitRemaining = res.headers.get('x-rate-limit-remaining');
       const xRateLimitReset = res.headers.get('x-rate-limit-reset');
-      console.log(`xRateLimitRemaining ${xRateLimitRemaining}, xRateLimitReset ${xRateLimitReset}`);
+      console.log(
+        `xRateLimitRemaining ${xRateLimitRemaining}, xRateLimitReset ${xRateLimitReset}`,
+      );
       if (xRateLimitRemaining == '0' && xRateLimitReset) {
-        throw new Error('xRateLimitWithReset')
+        throw new Error('xRateLimitWithReset');
         // const currentTime = new Date().valueOf() / 1000;
         // const timeDeltaMs = 1000 * (parseInt(xRateLimitReset) - currentTime);
         //
@@ -98,15 +100,13 @@ export async function requestApi<T>(
         // );
         // // I have seen this block for 800s (~13 *minutes*)
         // await new Promise((resolve) => setTimeout(resolve, timeDeltaMs));
-      }
-      else  {
-        throw new Error('xRateLimitWithoutReset')
+      } else {
+        throw new Error('xRateLimitWithoutReset');
         // console.log(
         //   `rate limit without xRateLimitReset header, wait for 30 minutes`,
         // );
         // await new Promise((resolve) => setTimeout(resolve, 30 * 60 * 1000));
       }
-
     }
   } while (res.status === 429);
 

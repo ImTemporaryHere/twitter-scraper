@@ -55,3 +55,14 @@ test('scraper can fetch conversation history', async () => {
 
   expect(response).toBeTruthy();
 });
+
+test('scraper can add other users to group conversation', async () => {
+  const scraper = await getScraper();
+
+  const response = await scraper.addParticipantToGroupConversation(
+    ['1759623353147547648'],
+    '1771880900113866863',
+  );
+
+  expect(response).toBeTruthy();
+});

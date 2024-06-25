@@ -17,7 +17,7 @@ export class ApiError extends Error {
         data = await response.text();
       } catch {}
     }
-
+    console.log(data);
     return new ApiError(response, data, `Response status: ${response.status}`);
   }
 }

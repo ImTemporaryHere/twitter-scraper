@@ -37,6 +37,7 @@ test('scraper can get tweet', async () => {
   delete actual?.replies;
   delete actual?.retweets;
   delete actual?.views;
+  delete actual?.bookmarkCount;
   expect(actual).toEqual(expected);
 });
 
@@ -167,6 +168,7 @@ test('scraper can get tweet quotes without logging in', async () => {
   delete quote?.quotedStatus?.replies;
   delete quote?.quotedStatus?.retweets;
   delete quote?.quotedStatus?.views;
+  delete quote?.quotedStatus?.bookmarkCount;
   expect(quote?.quotedStatus).toEqual(expected);
 });
 
@@ -208,6 +210,7 @@ test('scraper can get tweet quotes and replies', async () => {
   delete quote?.quotedStatus?.replies;
   delete quote?.quotedStatus?.retweets;
   delete quote?.quotedStatus?.views;
+  delete quote?.quotedStatus?.bookmarkCount;
   expect(quote?.quotedStatus).toEqual(expected);
 
   const reply = await scraper.getTweet('1237111868445134850');
@@ -219,6 +222,7 @@ test('scraper can get tweet quotes and replies', async () => {
   delete reply?.inReplyToStatus?.replies;
   delete reply?.inReplyToStatus?.retweets;
   delete reply?.inReplyToStatus?.views;
+  delete reply?.inReplyToStatus?.bookmarkCount;
   expect(reply?.inReplyToStatus).toEqual(expected);
 });
 
@@ -261,6 +265,7 @@ test('scraper can get retweet', async () => {
   delete retweet?.retweetedStatus?.replies;
   delete retweet?.retweetedStatus?.retweets;
   delete retweet?.retweetedStatus?.views;
+  delete retweet?.retweetedStatus?.bookmarkCount;
   expect(retweet?.retweetedStatus).toEqual(expected);
 });
 
@@ -296,6 +301,7 @@ test('scraper can get tweet views', async () => {
   delete actual?.replies;
   delete actual?.retweets;
   delete actual?.views;
+  delete actual?.bookmarkCount;
   expect(actual).toEqual(expected);
 });
 

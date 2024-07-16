@@ -199,7 +199,7 @@ export interface InboxInitialState {
       };
     }[];
     users: Record<string, User>;
-    conversations: Record<string, Conversation>;
+    conversations?: Record<string, Conversation>;
     key_registry_state: {
       status: string;
     };

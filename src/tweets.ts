@@ -506,7 +506,7 @@ type TweetContent = {
     itemType: string;
     __typename: string;
     tweet_results: {
-      result: TweetResult;
+      result: TweetResult | { tweet: TweetResult };
     };
     // Define other properties as needed
   };

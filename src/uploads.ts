@@ -62,7 +62,6 @@ export async function uploadMedia(
       auth,
       uploadInitResponse.media_id_string,
     );
-    console.log(uploadStatusResponse);
     uploaded = uploadStatusResponse.processing_info.state === 'succeeded';
   }
 

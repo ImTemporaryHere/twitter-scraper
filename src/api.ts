@@ -72,7 +72,7 @@ export async function requestApi<T>(
 
       return {
         success: false,
-        err: new Error('Failed to perform request.'),
+        err: new Error('Failed to perform request.' + err.toString()),
       };
     }
 
@@ -87,9 +87,7 @@ export async function requestApi<T>(
       */
       const xRateLimitRemaining = res.headers.get('x-rate-limit-remaining');
       const xRateLimitReset = res.headers.get('x-rate-limit-reset');
-      console.log(
-        `xRateLimitRemaining ${xRateLimitRemaining}, xRateLimitReset ${xRateLimitReset}`,
-      );
+
       if (xRateLimitRemaining == '0' && xRateLimitReset) {
         throw new Error('xRateLimitWithReset');
         // const currentTime = new Date().valueOf() / 1000;

@@ -121,3 +121,4 @@ package-lock.json
 cookies*.json
 
 gif-for-message.mp4
+/response-samples/

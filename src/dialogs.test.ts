@@ -1,5 +1,6 @@
 import { getScraper } from './test-utils';
 import * as path from 'path';
+import fs from 'fs/promises';
 
 test('scraper can get dialogs list', async () => {
   const scraper = await getScraper();
@@ -8,7 +9,21 @@ test('scraper can get dialogs list', async () => {
 
   expect(inboxInitialState.inbox_initial_state).toBeTruthy();
 
-  console.log(JSON.stringify(inboxInitialState));
+  const data = JSON.stringify(inboxInitialState);
+
+  await fs.writeFile('./response-samples/initial-state.json', data, 'utf8');
+});
+
+test('scraper can get inbox timeline', async () => {
+  const scraper = await getScraper();
+
+  const response = await scraper.getInboxTimeline('1825851867852661089');
+
+  expect(response).toBeTruthy();
+
+  const data = JSON.stringify(response);
+
+  await fs.writeFile('./response-samples/inbox-timeline-2.json', data, 'utf8');
 });
 
 test('scraper can send text message', async () => {

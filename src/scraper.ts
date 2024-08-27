@@ -50,7 +50,9 @@ import {
   fetchConversationHistory,
   FetchConversationHistoryParams,
   getDialogs,
+  getInboxTimeline,
   InboxInitialState,
+  InboxTimelineResponse,
   sendMessage,
   SendMessageParams,
   SendMessageResponse,
@@ -529,6 +531,14 @@ export class Scraper {
    */
   public getDialogs(): Promise<InboxInitialState> {
     return getDialogs(this.auth);
+  }
+
+  /**
+   * Fetches conversations timeline.
+   * @returns {Promise<InboxTimelineResponse>} object.
+   */
+  public getInboxTimeline(max_id: string): Promise<InboxTimelineResponse> {
+    return getInboxTimeline(this.auth, max_id);
   }
 
   /**

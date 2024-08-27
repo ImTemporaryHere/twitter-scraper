@@ -255,6 +255,227 @@ export async function getDialogs(
   return res.value;
 }
 
+export interface InboxTimelineResponse {
+  inbox_timeline: {
+    status: 'HAS_MORE' | 'AT_END';
+    min_entry_id: string;
+    entries: Array<{
+      message: {
+        id: string;
+        time: string; // If this represents a timestamp, you might want to use number instead
+        affects_sort: boolean;
+        request_id: string;
+        conversation_id: string;
+        message_data: {
+          id: string;
+          time: string; // If this represents a timestamp, you might want to use number instead
+          conversation_id: string;
+          sender_id: string;
+          text: string;
+          entities: {
+            hashtags: Array<{
+              // Add the structure for hashtags if they exist
+            }>;
+            symbols: Array<{
+              // Add the structure for symbols if they exist
+            }>;
+            user_mentions: Array<{
+              screen_name: string;
+              name: string;
+              id: number;
+              id_str: string;
+              indices: [number, number];
+            }>;
+            urls: Array<{
+              url: string;
+              expanded_url: string;
+              display_url: string;
+              indices: [number, number];
+            }>;
+          };
+          attachment?: {
+            animated_gif?: {
+              id: number;
+              id_str: string;
+              indices: [number, number];
+              media_url: string;
+              media_url_https: string;
+              url: string;
+              display_url: string;
+              expanded_url: string;
+              type: 'animated_gif';
+              original_info: {
+                width: number;
+                height: number;
+              };
+              sizes: {
+                large: {
+                  w: number;
+                  h: number;
+                  resize: 'fit' | 'crop';
+                };
+                thumb: {
+                  w: number;
+                  h: number;
+                  resize: 'fit' | 'crop';
+                };
+                medium: {
+                  w: number;
+                  h: number;
+                  resize: 'fit' | 'crop';
+                };
+                small: {
+                  w: number;
+                  h: number;
+                  resize: 'fit' | 'crop';
+                };
+              };
+              video_info: {
+                aspect_ratio: [number, number];
+                variants: Array<{
+                  bitrate: number;
+                  content_type: string;
+                  url: string;
+                }>;
+              };
+              features: Record<string, unknown>;
+              ext_alt_text: string;
+              ext_media_color: {
+                palette: Array<{
+                  rgb: {
+                    red: number;
+                    green: number;
+                    blue: number;
+                  };
+                  percentage: number;
+                }>;
+              };
+              ext: {
+                altText: {
+                  r: {
+                    ok: string;
+                  };
+                  ttl: number;
+                };
+                mediaColor: {
+                  r: {
+                    ok: {
+                      palette: Array<{
+                        rgb: {
+                          red: number;
+                          green: number;
+                          blue: number;
+                        };
+                        percentage: number;
+                      }>;
+                    };
+                  };
+                  ttl: number;
+                };
+                mediaStats: {
+                  r: string;
+                  ttl: number;
+                };
+              };
+              audio_only: boolean;
+            };
+          };
+        };
+      };
+    }>;
+    conversations: {
+      [key: string]: {
+        conversation_id: string;
+        type: 'GROUP_DM';
+        sort_event_id: string;
+        sort_timestamp: string;
+        participants: Array<{
+          user_id: string;
+          join_time: string;
+          last_read_event_id: string;
+          join_conversation_event_id: string;
+          is_admin: boolean;
+        }>;
+        create_time: string;
+        created_by_user_id: string;
+        name: string;
+        avatar_image_https: string;
+        avatar: {
+          image: {
+            original_info: {
+              url: string;
+              width: number;
+              height: number;
+            };
+          };
+        };
+        nsfw: boolean;
+        notifications_disabled: boolean;
+        mention_notifications_disabled: boolean;
+        last_read_event_id: string;
+        trusted: boolean;
+        low_quality: boolean;
+        muted: boolean;
+        status: 'HAS_MORE' | 'AT_END';
+        min_entry_id: string;
+        max_entry_id: string;
+      };
+    };
+  };
+}
+
+export async function getInboxTimeline(
+  auth: TwitterAuth,
+  max_id: string,
+): Promise<InboxTimelineResponse> {
+  const params = new URLSearchParams({
+    filter_low_quality: 'false',
+    include_quality: 'all',
+    max_id: max_id,
+    nsfw_filtering_enabled: 'false',
+    include_profile_interstitial_type: '1',
+    include_blocking: '1',
+    include_blocked_by: '1',
+    include_followed_by: '1',
+    include_want_retweets: '1',
+    include_mute_edge: '1',
+    include_can_dm: '1',
+    include_can_media_tag: '1',
+    include_ext_is_blue_verified: '1',
+    include_ext_verified_type: '1',
+    include_ext_profile_image_shape: '1',
+    skip_status: '1',
+    dm_secret_conversations_enabled: 'false',
+    krs_registration_enabled: 'true',
+    cards_platform: 'Web-12',
+    include_cards: '1',
+    include_ext_alt_text: 'true',
+    include_ext_limited_action_results: 'true',
+    include_quote_count: 'true',
+    include_reply_count: '1',
+    tweet_mode: 'extended',
+    include_ext_views: 'true',
+    dm_users: 'false',
+    include_groups: 'true',
+    include_inbox_timelines: 'true',
+    include_ext_media_color: 'true',
+    supports_reactions: 'true',
+    include_ext_edit_control: 'true',
+    ext: 'mediaColor,altText,businessAffiliationsLabel,mediaStats,highlightedLabel,voiceInfo,birdwatchPivot,superFollowMetadata,unmentionInfo,editControl,article',
+  });
+
+  const res = await requestApi<InboxTimelineResponse>(
+    `https://twitter.com/i/api/1.1/dm/inbox_timeline/trusted.json?${params.toString()}`,
+    auth,
+  );
+
+  if (!res.success) {
+    throw res.err;
+  }
+
+  return res.value;
+}
+
 export interface SendMessageParams {
   conversation_id: string;
   absolutePathToMedia?: string;

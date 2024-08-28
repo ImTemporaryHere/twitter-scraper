@@ -45,6 +45,8 @@ export type RequestApiResult<T> =
  * @param auth - The instance of {@link TwitterAuth} that will be used to authorize this request.
  * @param method - The HTTP method used when sending this request.
  * @param body
+ * @param {Headers} customHeaders - some headers
+ * @param {number} timeout - timeout for abortsignal
  */
 export async function requestApi<T>(
   url: string,
@@ -52,6 +54,7 @@ export async function requestApi<T>(
   method: 'GET' | 'POST' = 'GET',
   body?: BodyInit,
   customHeaders?: Headers,
+  timeout?: number,
 ): Promise<RequestApiResult<T>> {
   const headers = customHeaders ?? new Headers();
   await auth.installTo(headers, url);
@@ -63,7 +66,7 @@ export async function requestApi<T>(
         method,
         headers,
         body,
-        signal: AbortSignal.timeout(60_000),
+        signal: AbortSignal.timeout(timeout ?? 60_000),
       });
     } catch (err) {
       if (!(err instanceof Error)) {

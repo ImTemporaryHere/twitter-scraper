@@ -529,16 +529,19 @@ export class Scraper {
    * Fetches user dialogs list.
    * @returns {Promise<InboxInitialState>} object.
    */
-  public getDialogs(): Promise<InboxInitialState> {
-    return getDialogs(this.auth);
+  public getDialogs(timeout?: number): Promise<InboxInitialState> {
+    return getDialogs(this.auth, timeout);
   }
 
   /**
    * Fetches conversations timeline.
    * @returns {Promise<InboxTimelineResponse>} object.
    */
-  public getInboxTimeline(max_id: string): Promise<InboxTimelineResponse> {
-    return getInboxTimeline(this.auth, max_id);
+  public getInboxTimeline(
+    max_id: string,
+    timeout?: number,
+  ): Promise<InboxTimelineResponse> {
+    return getInboxTimeline(this.auth, max_id, timeout);
   }
 
   /**

@@ -40,6 +40,7 @@ export async function getScraper(
   if (proxyUrl) {
     agent = new HttpsProxyAgent(proxyUrl, {
       rejectUnauthorized: false,
+      keepAlive: true,
     });
   }
 

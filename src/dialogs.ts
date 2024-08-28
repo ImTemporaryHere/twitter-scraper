@@ -208,6 +208,7 @@ export interface InboxInitialState {
 
 export async function getDialogs(
   auth: TwitterAuth,
+  timeout?: number,
 ): Promise<InboxInitialState> {
   const params = new URLSearchParams({
     nsfw_filtering_enabled: 'false',
@@ -246,6 +247,10 @@ export async function getDialogs(
   const res = await requestApi<InboxInitialState>(
     `https://twitter.com/i/api/1.1/dm/inbox_initial_state.json?${params.toString()}`,
     auth,
+    undefined,
+    undefined,
+    undefined,
+    timeout,
   );
 
   if (!res.success) {
@@ -427,6 +432,7 @@ export interface InboxTimelineResponse {
 export async function getInboxTimeline(
   auth: TwitterAuth,
   max_id: string,
+  timeout?: number,
 ): Promise<InboxTimelineResponse> {
   const params = new URLSearchParams({
     filter_low_quality: 'false',
@@ -467,6 +473,10 @@ export async function getInboxTimeline(
   const res = await requestApi<InboxTimelineResponse>(
     `https://twitter.com/i/api/1.1/dm/inbox_timeline/trusted.json?${params.toString()}`,
     auth,
+    undefined,
+    undefined,
+    undefined,
+    timeout,
   );
 
   if (!res.success) {
